@@ -80,7 +80,8 @@ struct ContentView: View {
         .onAppear {
             labelFocused = true
             // Pick the save folder at first launch; after that it's remembered.
-            if folder.isEmpty { DispatchQueue.main.async { _ = pickFolder() } }        }
+            if folder.isEmpty { DispatchQueue.main.async { _ = pickFolder() } }
+        }
     }
 
     /// Shows a folder picker; returns false if cancelled.
