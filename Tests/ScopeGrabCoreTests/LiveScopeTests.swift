@@ -6,7 +6,9 @@ import Testing
 ///   SCOPE_HOST=192.168.0.114 swift test --filter Live
 private let host = ProcessInfo.processInfo.environment["SCOPE_HOST"]
 
-@Suite(.enabled(if: host != nil, "set SCOPE_HOST to run"))
+/// Serialized: the scope stalls when two SCPI socket connections are open at
+/// once, and both time out.
+@Suite(.enabled(if: host != nil, "set SCOPE_HOST to run"), .serialized)
 struct LiveScopeTests {
     @Test func screenIsAn800x480Bmp() async throws {
         let t0 = Date()
