@@ -21,6 +21,13 @@ import Testing
     #expect(throws: BlockError.badHeader) { try parseBlockHeader(Array("#0".utf8)) }
 }
 
+@Test func measurementParsing() {
+    #expect(parseMeasurement("1.840000e-03") == 0.00184)
+    #expect(parseMeasurement("9.9e37") == nil)
+    #expect(parseMeasurement("9.9E+37") == nil)
+    #expect(parseMeasurement("garbage") == nil)
+}
+
 private let utc = TimeZone(identifier: "UTC")!
 private let date = Date(timeIntervalSince1970: 1_794_321_125) // 2026-11-10 14:32:05 UTC
 

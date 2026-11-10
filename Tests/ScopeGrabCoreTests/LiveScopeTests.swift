@@ -28,6 +28,24 @@ struct LiveScopeTests {
         #expect(idn.contains("DS2"))
         #expect(size > 1_000_000)
     }
+
+    /// Changes the scope's measurement bar (adds VPP and FREQ for each channel on).
+    @Test func frozenCaptureReadsStableValuesAndRestoresRunState() async throws {
+        let (before, result, again, after) = try await Scope.session(host: host!, timeout: 20) { s in
+            let before = try await s.query(":TRIG:STAT?")
+            let result = try await s.frozenCapture(items: ["VPP", "FREQuency"])
+            try await Task.sleep(for: .milliseconds(500))
+            let after = try await s.query(":TRIG:STAT?")
+            // A second frozen capture must also read valid values.
+            let again = try await s.frozenCapture(items: ["VPP", "FREQuency"])
+            return (before, result, again, after)
+        }
+        print("frozen: \(result.values)  again: \(again.values)  state \(before) -> \(after)")
+        #expect(result.screen.count == 1_152_054)
+        #expect(result.values.contains { $0.channel == 1 && $0.item == "VPP" && $0.value != nil })
+        #expect(again.values.allSatisfy { $0.value != nil } == result.values.allSatisfy { $0.value != nil })
+        #expect((before == "STOP") == (after == "STOP"))
+    }
 }
 
 @Test func refusedConnectionFailsFast() async throws {
