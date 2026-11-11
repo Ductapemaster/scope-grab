@@ -75,7 +75,12 @@ struct ContentView: View {
             }
             .aspectRatio(800.0 / 480.0, contentMode: .fit)
             // Dragging the preview drags the saved PNG, so dropping it on a folder copies the file.
-            .onDrag { lastFile.flatMap { NSItemProvider(contentsOf: $0) } ?? NSItemProvider() }
+            .onDrag {
+                guard let lastFile, let provider = NSItemProvider(contentsOf: lastFile) else { return NSItemProvider() }
+                // Without this, Finder names the dropped file "PNG image.png".
+                provider.suggestedName = lastFile.deletingPathExtension().lastPathComponent
+                return provider
+            }
             .contextMenu {
                 Button("Copy Image", action: copyImage).disabled(lastFile == nil)
                 Button("Show in Finder") {
