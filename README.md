@@ -1,11 +1,11 @@
 # Scope Grab
 
-A small macOS app that captures the screen of the Rigol DS2072A bench scope over USB in one keystroke. Each capture is copied to the clipboard as an image and saved as a PNG named `<YYYY-MM-DD HH-MM-SS> <label>.png` in a folder you choose. The window shows a preview of the last capture.
+A small macOS app that captures the screen of the Rigol DS2072A bench scope over USB in one keystroke. Each capture is saved as a PNG named `<YYYY-MM-DD HH-MM-SS> <label>.png` in a folder you choose. The window shows a preview of the last capture.
 
 ## Use
 
-1. Type a label (optional), press Enter.
-2. Paste wherever you need the image. The file is already saved.
+1. Type a label (optional), press Enter. The capture is saved.
+2. To use it elsewhere, press **Copy** (⇧⌘C) and paste, or drag the preview into a folder or app. Right-click the preview for Copy Image and Show in Finder.
 
 The save folder is picked at first launch and changed with **Change…**. It's remembered.
 

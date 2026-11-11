@@ -23,6 +23,7 @@ struct ContentView: View {
     @AppStorage("folder") private var folder = ""
     @State private var label = ""
     @State private var preview: NSImage?
+    @State private var lastFile: URL?
     @State private var status = "Ready"
     @State private var isError = false
     @State private var busy = false
@@ -54,6 +55,10 @@ struct ContentView: View {
                         Button("Capture", action: capture)
                             .keyboardShortcut(.defaultAction)
                             .disabled(busy)
+                        Button("Copy", action: copyImage)
+                            .keyboardShortcut("c", modifiers: [.command, .shift])
+                            .disabled(lastFile == nil)
+                            .help("Copy the last capture to the clipboard (⇧⌘C)")
                     }
                 }
             }
@@ -69,6 +74,15 @@ struct ContentView: View {
                 if busy { ProgressView() }
             }
             .aspectRatio(800.0 / 480.0, contentMode: .fit)
+            // Dragging the preview drags the saved PNG, so dropping it on a folder copies the file.
+            .onDrag { lastFile.flatMap { NSItemProvider(contentsOf: $0) } ?? NSItemProvider() }
+            .contextMenu {
+                Button("Copy Image", action: copyImage).disabled(lastFile == nil)
+                Button("Show in Finder") {
+                    if let lastFile { NSWorkspace.shared.activateFileViewerSelecting([lastFile]) }
+                }
+                .disabled(lastFile == nil)
+            }
             .frame(minWidth: 400, idealWidth: 640, maxWidth: .infinity, maxHeight: .infinity)
 
             HStack(alignment: .firstTextBaseline) {
@@ -133,13 +147,9 @@ struct ContentView: View {
                 let name = captureFilename(label: label, date: started) {
                     FileManager.default.fileExists(atPath: dir.appendingPathComponent($0).path)
                 }
-                // Write first: a failed write must leave the clipboard as it was.
-                try png.write(to: dir.appendingPathComponent(name), options: .withoutOverwriting)
-                let pb = NSPasteboard.general
-                pb.clearContents()
-                pb.setData(png, forType: .png)
-                if let tiff = rep.tiffRepresentation { pb.setData(tiff, forType: .tiff) }
-
+                let file = dir.appendingPathComponent(name)
+                try png.write(to: file, options: .withoutOverwriting)
+                lastFile = file
                 preview = NSImage(data: png)
                 status = "Captured \(started.formatted(date: .omitted, time: .standard)) · saved \(name)"
             } catch {
@@ -147,6 +157,21 @@ struct ContentView: View {
                 status = "Capture failed: \(error.localizedDescription)"
             }
         }
+    }
+
+    /// Puts the last capture on the clipboard as PNG and TIFF, so any app can paste it.
+    private func copyImage() {
+        guard let lastFile, let png = try? Data(contentsOf: lastFile) else {
+            status = "Can't copy: the last capture's file is gone"
+            isError = true
+            return
+        }
+        let pb = NSPasteboard.general
+        pb.clearContents()
+        pb.setData(png, forType: .png)
+        if let tiff = NSBitmapImageRep(data: png)?.tiffRepresentation { pb.setData(tiff, forType: .tiff) }
+        status = "Copied \(lastFile.lastPathComponent) to the clipboard"
+        isError = false
     }
 
     /// Keeps the label but selects it, so typing the next one replaces it.
