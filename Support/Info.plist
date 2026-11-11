@@ -8,6 +8,8 @@
 	<string>Scope Grab</string>
 	<key>CFBundleExecutable</key>
 	<string>ScopeGrab</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.dankouba.scopegrab</string>
 	<key>CFBundlePackageType</key>

@@ -35,6 +35,7 @@ The first runs the unit tests. The second adds live capture tests against the sc
 - `Sources/ScopeGrab/App.swift`: the SwiftUI window.
 - `Support/Info.plist`: the app bundle's plist, copied in by `build.sh`.
 - `tools/fake_scope.py`: a stand-in scope for testing.
+- `tools/make_icon.swift`: draws the app icon into `Support/AppIcon.icns`. Rerun it after changing the drawing.
 - `docs/`: the design and the roadmap.
 
 Scope connection setup (Auto IP off, the SCPI socket on TCP 5555): the vault note `3 Reference/Workshop/Rigol DS2072A/Rigol DS2072A.md`.
