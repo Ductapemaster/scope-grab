@@ -5,6 +5,9 @@ import UniformTypeIdentifiers
 /// The last capture, framed like the scope's own display. Before the first capture it
 /// shows an empty graticule. Dragging it drags the saved PNG.
 struct ScreenView: View {
+    /// Height over width of the framed screen: 800 × 480 plus the 8 pt bezel.
+    static let aspect = 496.0 / 816.0
+
     @Environment(CaptureModel.self) private var model
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var flash = 0.0
@@ -40,7 +43,7 @@ struct ScreenView: View {
             RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .strokeBorder(.white.opacity(0.08), lineWidth: 1)
         )
-        .aspectRatio(816.0 / 496.0, contentMode: .fit) // 800 × 480 screen plus the 8 pt bezel
+        .aspectRatio(1 / Self.aspect, contentMode: .fit)
         .shadow(color: .black.opacity(0.25), radius: 8, y: 3)
         .onChange(of: model.captures) {
             guard case .captured = model.status, !reduceMotion else { return }

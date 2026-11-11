@@ -52,18 +52,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 struct ContentView: View {
     @Environment(CaptureModel.self) private var model
     @FocusState private var labelFocused: Bool
+    @State private var window: NSWindow?
+    @State private var area = CGSize.zero
+
+    static let margin = 20.0
 
     var body: some View {
         VStack(spacing: 0) {
             CaptureBar(labelFocused: $labelFocused)
             Divider()
             ScreenView()
-                .padding(20)
+                .padding(ContentView.margin)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(.background.secondary)
+                .onGeometryChange(for: CGSize.self) { $0.size } action: { area = $0; fitWindow() }
             StatusBar()
         }
         .frame(minWidth: 760, minHeight: 440)
+        .background(WindowAccessor { window = $0; fitWindow() })
+        .onReceive(NotificationCenter.default.publisher(for: NSWindow.didEndLiveResizeNotification)) { note in
+            if note.object as? NSWindow === window { fitWindow() }
+        }
         .onAppear {
             labelFocused = true
             model.start()
@@ -71,6 +80,21 @@ struct ContentView: View {
         // Keep the label but select it after each capture and save, so typing the next one replaces it.
         .onChange(of: model.captures) { selectLabel() }
         .onChange(of: model.saves) { selectLabel() }
+    }
+
+    /// Sets the window's height from its width so the scope screen has the same margin on
+    /// all four sides. Waits for a live resize to end rather than fighting the drag.
+    private func fitWindow() {
+        guard let window, !window.inLiveResize, area.width > 0 else { return }
+        let m = Self.margin
+        let wanted = ((area.width - 2 * m) * ScreenView.aspect + 2 * m).rounded()
+        var delta = wanted - area.height
+        guard abs(delta) > 1 else { return }
+        var frame = window.frame
+        if let screen = window.screen?.visibleFrame { delta = min(delta, screen.height - frame.height) }
+        frame.origin.y -= delta // keep the top edge where it is
+        frame.size.height += delta
+        window.setFrame(frame, display: true)
     }
 
     private func selectLabel() {

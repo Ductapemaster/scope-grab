@@ -8,7 +8,9 @@ struct StatusBar: View {
         VStack(spacing: 0) {
             Divider()
             HStack(spacing: 10) {
-                message.frame(maxWidth: .infinity, alignment: .leading)
+                message
+                // Always present, so the USB status holds the right edge whatever the message.
+                Spacer(minLength: 12)
                 usbIndicator
             }
             .font(.callout)
@@ -26,7 +28,7 @@ struct StatusBar: View {
         case .capturing:
             Text("Capturing…").foregroundStyle(.secondary)
         case .captured(let date):
-            Text("Captured the screen at \(date.formatted(date: .omitted, time: .standard))")
+            Text("Captured \(date.formatted(date: .omitted, time: .standard))")
                 .foregroundStyle(.secondary)
         case .saved(let file):
             Button(action: model.showInFinder) {
