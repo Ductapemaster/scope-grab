@@ -24,14 +24,6 @@ struct CaptureBar: View {
                 }
             }
 
-            Button(action: model.copyImage) {
-                Label("Copy", systemImage: "doc.on.doc")
-            }
-            .controlSize(.large)
-            .fixedSize()
-            .disabled(!model.hasCapture)
-            .help("Copy the capture to the clipboard (⇧⌘C)")
-
             Button(action: model.save) {
                 Label("Save", systemImage: "square.and.arrow.down")
             }
@@ -39,6 +31,14 @@ struct CaptureBar: View {
             .fixedSize()
             .disabled(!model.canSave)
             .help(model.savedFile != nil ? "This capture is saved" : "Save the capture to the folder under the file name shown (⌘S)")
+
+            Button(action: model.copyImage) {
+                Label("Copy", systemImage: "doc.on.doc")
+            }
+            .controlSize(.large)
+            .fixedSize()
+            .disabled(!model.hasCapture)
+            .help("Copy the capture to the clipboard (⇧⌘C)")
 
             Button(action: model.capture) {
                 Label("Capture", systemImage: "camera.aperture")

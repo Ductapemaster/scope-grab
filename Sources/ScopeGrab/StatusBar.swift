@@ -31,12 +31,11 @@ struct StatusBar: View {
         case .saved(let file):
             Button(action: model.showInFinder) {
                 HStack(spacing: 0) {
-                    Text("Saved ").foregroundStyle(.secondary).fixedSize()
-                    Text(file.lastPathComponent).lineLimit(1).truncationMode(.middle).layoutPriority(1)
-                    Text(" to ").foregroundStyle(.secondary).fixedSize()
-                    Text((file.deletingLastPathComponent().path as NSString).abbreviatingWithTildeInPath)
+                    Text("Saved to ").foregroundStyle(.secondary).fixedSize()
+                    Text((file.deletingLastPathComponent().path as NSString).abbreviatingWithTildeInPath + "/")
                         .foregroundStyle(.secondary)
                         .lineLimit(1).truncationMode(.middle)
+                    Text(file.lastPathComponent).lineLimit(1).truncationMode(.middle).layoutPriority(1)
                 }
             }
             .buttonStyle(.plain)
