@@ -4,10 +4,10 @@ A small macOS app that captures the screen of the Rigol DS2072A bench scope over
 
 ## Use
 
-1. Type a label (optional), press Enter. The capture is saved.
+1. Type a label (optional), press Enter (or ⌘R). The capture is saved.
 2. To use it elsewhere, press **Copy** (⇧⌘C) and paste, or drag the preview into a folder or app. Right-click the preview for Copy Image and Show in Finder.
 
-The save folder is picked at first launch and changed with **Change…**. It's remembered.
+The save folder is picked at first launch. It's remembered, and the folder menu at the bottom left changes or opens it.
 
 The scope connects over USB (the rear USB Device port to the Mac), with Utility → IO Setting → USB Device set to Computer. The app finds it on its own.
 
@@ -34,7 +34,7 @@ The first runs the unit tests. The second adds live capture tests against the sc
 ## Layout
 
 - `Sources/ScopeGrabCore/`: the scope's USBTMC client (`USBTMC.swift`), the IEEE 488.2 block parser, and the filename builder.
-- `Sources/ScopeGrab/App.swift`: the SwiftUI window.
+- `Sources/ScopeGrab/`: the SwiftUI app. `CaptureModel.swift` holds the state and actions; `App.swift` (window, toolbar, menus), `ScreenView.swift` (the preview) and `StatusBar.swift` lay them out.
 - `Support/Info.plist`: the app bundle's plist, copied in by `build.sh`.
 - `tools/make_icon.swift`: draws the app icon into `Support/AppIcon.icns`. Rerun it after changing the drawing.
 - `docs/`: the design and the roadmap.
