@@ -9,7 +9,7 @@ A native macOS (SwiftUI) app that captures the Rigol DS2072A's screen over USB (
 - Settings live in UserDefaults under `com.dankouba.scopegrab` (`folder`, `filenameTemplate`).
 
 ## Guardrails
-- SCPI commands that change scope state (`:STOP`, `:RUN`, settings) affect Dan's bench session; restore the prior state.
+- SCPI commands that change scope state (`:STOP`, `:RUN`, settings) affect the live bench session; restore the prior state.
 
 ## Where things go
 Create each doc straight into its home by what it is — the folder *is* its role, and it exists as soon as its first file does (don't pre-create `docs/`; a fresh repo is just this file + README.md):

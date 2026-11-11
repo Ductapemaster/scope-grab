@@ -42,8 +42,6 @@ The first runs the unit tests. The second adds live capture tests against the sc
 - `tools/make_icon.swift`: draws the app icon into `Support/AppIcon.icns`. Rerun it after changing the drawing.
 - `docs/`: the design, the roadmap, and the README screenshot (`docs/images/`).
 
-More on the scope: the vault note `3 Reference/Workshop/Rigol DS2072A/Rigol DS2072A.md`.
-
 ## License
 
 MIT. See `LICENSE`.

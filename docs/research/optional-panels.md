@@ -1,6 +1,6 @@
 # Optional panels: scope settings, measurements, SCPI console
 
-A proposal for three optional interfaces around the capture window. None is built, and each needs Dan's decisions below before it is. The capture flow stays as it is: type a label, press Enter. Everything here is hidden until asked for, and none of it may add a step or a delay to a capture.
+A proposal for three optional interfaces around the capture window. None is built, and each needs the decisions below before it is. The capture flow stays as it is: type a label, press Enter. Everything here is hidden until asked for, and none of it may add a step or a delay to a capture.
 
 ## Terms
 
@@ -68,7 +68,7 @@ The smallest panel and the most useful for exploring the scope, so it comes firs
 
 ## 3. Scope settings (inspector, Scope tab)
 
-The controls Dan reaches for between test points, mirroring the scope's own menus:
+The controls reached for between test points, mirroring the scope's own menus:
 
 - Run, Stop, Single and Auto (`:RUN`, `:STOP`, `:SING`, `:AUToscale`), with the current state from `:TRIG:STAT?`.
 - Per channel: on or off, V/div, offset, coupling, probe ratio (`:CHANnel<n>:DISPlay`, `:SCALe`, `:OFFSet`, `:COUPling`, `:PROBe`).
@@ -77,13 +77,13 @@ The controls Dan reaches for between test points, mirroring the scope's own menu
 
 The panel reads these when it opens and after each change it makes. It doesn't poll: knobs turned on the scope show after the panel's Refresh button. Steppers move in the scope's own 1-2-5 sequence, so a click does what a knob detent does.
 
-These commands change the bench state on purpose, at Dan's request. The repo guardrail about restoring state applies to the app's own side effects (section 4), not to settings Dan changes by hand.
+These commands change the bench state on purpose, at the user's request. The repo guardrail about restoring state applies to the app's own side effects (section 4), not to settings changed by hand.
 
 ## 4. Measurements (inspector, Measure tab)
 
 Measurements were ruled out once (`docs/design/scope-grab.md`, Non-goals) for three reasons: a query adds its item to the measurement bar, no command lists the items already on it, and stable values need a STOP/RUN cycle. This proposal works with the first two instead of around them: **the app owns the measurement bar.**
 
-- **Configure:** Dan picks up to five items in the panel (source and type, e.g. CH1 Vpp, CH1 Freq, CH2 Vrms). Applying them sends `:MEAS:CLE ALL`, then each item's set form in order, so the scope's bar shows exactly the app's list and the app always knows what's on it.
+- **Configure:** The user picks up to five items in the panel (source and type, e.g. CH1 Vpp, CH1 Freq, CH2 Vrms). Applying them sends `:MEAS:CLE ALL`, then each item's set form in order, so the scope's bar shows exactly the app's list and the app always knows what's on it.
 - **Capture:** with measurements on, a capture reads the trigger state, stops the scope, waits for `STOP`, grabs the screen, queries each configured item, then restores the prior state (run, stopped, or re-armed single). `docs/research/ds2000a-measure-scpi.md` section 4 gives the restore logic. The screenshot and the numbers come from the same frozen acquisition.
 - **Record:** the values go into a CSV next to the captures (see the open decisions), one row per capture, with the filename as the key. Invalid results (≥ 9e37) are written empty.
 - **Cost:** the STOP/RUN cycle and five queries add an estimated 0.3 to 0.6 s per capture. That's an estimate to measure on the bench; the panel's on/off switch keeps the plain capture at today's 1.15 s.
@@ -103,7 +103,7 @@ Bench checks before building, each one a question the guide leaves open:
 
 Each is its own branch and can stop there. The plan for any one is written when it's picked up.
 
-## Open decisions for Dan
+## Open decisions
 
 - **Measurement output:** one `measurements.csv` per save folder, appended per capture (a table of test-point readings in one file), or a sidecar `<capture name>.csv` per capture (travels with the image)? The first suits the Sherwood workflow of probing many points; the second keeps each capture self-contained.
 - **Measurements in the filename or label:** off by default. Should a single headline value (e.g. Vpp) be appendable to the filename?

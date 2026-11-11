@@ -4,11 +4,11 @@ A small native macOS app that captures the screen of the bench oscilloscope (Rig
 
 ## Why
 
-Dan is restoring an old analog receiver (the Sherwood S-7100A, notes in the vault at `1 Projects/2026 Sherwood 7100A Amp Repair/`). The workflow is: probe a test point, grab the scope screen, drop the image onto a whiteboard next to the open schematic, and move on to the next point. The whiteboard app isn't chosen yet and is out of scope here. What it needs from this tool is an image it can paste or drop in.
+The app supports restoring an old analog receiver (a Sherwood S-7100A). The workflow is: probe a test point, grab the scope screen, drop the image onto a whiteboard next to the open schematic, and move on to the next point. The whiteboard app isn't chosen yet and is out of scope here. What it needs from this tool is an image it can paste or drop in.
 
 A capture already works from the terminal (`rigol_scpi.py --screenshot`). But typing a command and a filename at every test point is too much friction, and the script doesn't touch the clipboard.
 
-Success: Dan presses Enter, and within about 2 s the preview shows the trace he's looking at. If it's the one he wants, ⌘S saves it into the project folder under a name carrying the label he typed; Copy or a drag puts it in another app.
+Success: pressing Enter shows the trace on the scope in the preview within about 2 s. If it's the one wanted, ⌘S saves it into the project folder under a name carrying the typed label; Copy or a drag puts it in another app.
 
 ## Goals
 
@@ -37,19 +37,19 @@ Success: Dan presses Enter, and within about 2 s the preview shows the trace he'
 - Scope: Rigol DS2072A, firmware 00.03.06, on USB with Utility → IO Setting → USB Device set to Computer.
 - Transport: USBTMC (USB Test & Measurement Class). The scope enumerates as vendor 0x1AB1, product 0x04B0, with interface 0 of class FE/03/01, bulk-out endpoint 0x02 and bulk-in endpoint 0x86. macOS has no driver for that interface, so the app opens it from user space through Apple's IOUSBHost framework, with no libusb. Each command goes out as a USBTMC message with a 12-byte header. Each reply is fetched with a request message, and a reply larger than one transfer arrives as one header followed by raw chunks.
 - Protocol: SCPI, with commands terminated by `\n`. `:DISP:DATA?` returns an IEEE 488.2 definite-length block: `#`, one digit N, N digits giving the byte count, the data, then a trailing `\n`. The data is an 800 × 480 24-bit BMP, about 1.1 MB. One capture takes about 1.15 s over USB.
-- Reference implementation: `open_scope()`, `screenshot()` and `read_ieee_block()` in `3 Reference/Workshop/Rigol DS2072A/rigol_scpi.py` in the vault.
+- Reference implementation: `open_scope()`, `screenshot()` and `read_ieee_block()` in `rigol_scpi.py`, a Python script kept outside this repo.
 - Platform: macOS 27, Apple Silicon, Swift 6.4 command-line toolchain. Personal use on one machine, not distributed.
 
-## Decided with Dan
+## Decided
 
 - **Toolkit:** a native Swift (SwiftUI) app, not Python. The clipboard image, BMP → PNG conversion, folder picker, remembered settings and Dock launching are all built into macOS.
 - **Connection:** USB, chosen once the scope's LAN proved faulty. The app finds the scope on its own, so the window has no connection setting.
-- **Outputs:** a capture is held in the window until Dan saves it, so only the traces he keeps reach the folder. The clipboard is touched only on request: capturing never overwrites what Dan has copied.
+- **Outputs:** a capture is held in the window until it's saved, so only the traces kept reach the folder. The clipboard is touched only on request: capturing never overwrites what's already on the clipboard.
 - **Label:** typed before capturing, used in the filename only. A copied image is just the screen.
 - **Color:** Capture and the save folder are the two colored controls, since a capture depends on both: Capture filled as the main action, the folder tinted.
-- **Save folder:** picked at the first save, shown in the capture bar and changeable from there at any time, and sticky across captures and launches. Files go directly into the chosen folder. Dan makes subfolders himself when he wants them.
+- **Save folder:** picked at the first save, shown in the capture bar and changeable from there at any time, and sticky across captures and launches. Files go directly into the chosen folder. Subfolders are made by hand when wanted.
 - **Preview:** the last capture is shown in the window.
-- **Timestamp:** shown in the app window with the preview (Dan said "on the screen", read as the window, not drawn on the image).
+- **Timestamp:** shown in the app window with the preview ("on the screen" read as the window, not drawn on the image).
 
 ## Window
 
@@ -89,7 +89,7 @@ On any failure (scope not found on USB, a USB timeout, a malformed reply, or a w
 
 ## Builder's calls
 
-These are the builder's choices and Dan hasn't reviewed them:
+These are the builder's choices and haven't been reviewed:
 
 - **App name:** Scope Grab. The repo is `~/Workspaces/scope-grab`.
 - **Build:** a Swift package (a `ScopeGrabCore` library for the protocol and filenames, a `ScopeGrab` executable for the UI) with no Xcode project. `build.sh` wraps the release binary and `Support/Info.plist` into `build/Scope Grab.app`, ad-hoc signs it, and with `install` copies it to `~/Applications`.
