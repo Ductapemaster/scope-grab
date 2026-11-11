@@ -57,3 +57,32 @@ private let date = Date(timeIntervalSince1970: 1_794_321_125) // 2026-11-10 14:3
     #expect(captureFilename(label: "TP4", date: date, timeZone: utc) { taken.contains($0) }
             == "2026-11-10 14-32-05 TP4 3.png")
 }
+
+@Test func templateLabelFirst() {
+    let t = FilenameTemplate("{label} {date} {time}")
+    #expect(t.filename(label: "TP4", date: date, timeZone: utc) { _ in false } == "TP4 2026-11-10 14-32-05.png")
+    // A blank label leaves no leading space.
+    #expect(t.filename(label: "", date: date, timeZone: utc) { _ in false } == "2026-11-10 14-32-05.png")
+}
+
+@Test func templateTrimsDanglingSeparators() {
+    let t = FilenameTemplate("{date}_{label}")
+    #expect(t.filename(label: "", date: date, timeZone: utc) { _ in false } == "2026-11-10.png")
+    #expect(t.filename(label: "TP4", date: date, timeZone: utc) { _ in false } == "2026-11-10_TP4.png")
+}
+
+@Test func templateWithoutLabelGetsItAppended() {
+    #expect(FilenameTemplate("{time}").pattern == "{time} {label}")
+    #expect(FilenameTemplate("  ").pattern == FilenameTemplate.standard)
+}
+
+@Test func templateLabelOnlyFallsBackToTimestampWhenBlank() {
+    let t = FilenameTemplate("{label}")
+    #expect(t.filename(label: "", date: date, timeZone: utc) { _ in false } == "2026-11-10 14-32-05.png")
+}
+
+@Test func templateParts() {
+    let p = FilenameTemplate(FilenameTemplate.standard).parts(date: date, timeZone: utc)
+    #expect(p.before == "2026-11-10 14-32-05 ")
+    #expect(p.after == ".png")
+}
