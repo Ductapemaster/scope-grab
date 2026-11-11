@@ -26,6 +26,8 @@ struct ContentView: View {
     @State private var status = "Ready"
     @State private var isError = false
     @State private var busy = false
+    @State private var scopeOnUSB: Bool?
+    @State private var watcher: ScopeWatcher?
     @FocusState private var labelFocused: Bool
 
     var body: some View {
@@ -69,15 +71,27 @@ struct ContentView: View {
             .aspectRatio(800.0 / 480.0, contentMode: .fit)
             .frame(minWidth: 400, idealWidth: 640, maxWidth: .infinity, maxHeight: .infinity)
 
-            Text(status)
-                .foregroundStyle(isError ? .red : .secondary)
-                .lineLimit(2)
-                .textSelection(.enabled)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            HStack(alignment: .firstTextBaseline) {
+                Text(status)
+                    .foregroundStyle(isError ? .red : .secondary)
+                    .lineLimit(2)
+                    .textSelection(.enabled)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                if let scopeOnUSB {
+                    Label {
+                        Text(scopeOnUSB ? "DS2072A on USB" : "No scope on USB")
+                    } icon: {
+                        Circle().fill(scopeOnUSB ? .green : .secondary).frame(width: 7, height: 7)
+                    }
+                    .foregroundStyle(.secondary)
+                    .fixedSize()
+                }
+            }
         }
         .padding(16)
         .onAppear {
             labelFocused = true
+            watcher = ScopeWatcher { scopeOnUSB = $0 }
             // Pick the save folder at first launch; after that it's remembered.
             if folder.isEmpty { DispatchQueue.main.async { _ = pickFolder() } }
         }

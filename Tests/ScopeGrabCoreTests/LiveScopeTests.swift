@@ -23,6 +23,15 @@ struct LiveScopeTests {
         #expect(size == 1_152_054)
     }
 
+    @MainActor @Test func watcherSeesTheScope() async {
+        var watcher: ScopeWatcher?
+        let present = await withCheckedContinuation { cont in
+            watcher = ScopeWatcher { cont.resume(returning: $0) }
+        }
+        #expect(present)
+        _ = watcher
+    }
+
     @Test func backToBackSessions() throws {
         for _ in 0..<3 { _ = try Scope.session { try $0.query("*IDN?") } }
     }
