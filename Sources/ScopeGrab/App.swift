@@ -18,6 +18,9 @@ struct ScopeGrabApp: App {
                 Button("Capture Screen") { model.capture() }
                     .keyboardShortcut("r")
                     .disabled(model.busy)
+                Button("Save Capture") { model.save() }
+                    .keyboardShortcut("s")
+                    .disabled(!model.canSave)
                 Divider()
                 Button("Change Save Folder…") { model.pickFolder() }
                     .keyboardShortcut("o", modifiers: [.command, .shift])
@@ -29,10 +32,10 @@ struct ScopeGrabApp: App {
                 // ⇧⌘C, not ⌘C: the label field keeps ⌘C for copying text.
                 Button("Copy Capture") { model.copyImage() }
                     .keyboardShortcut("c", modifiers: [.command, .shift])
-                    .disabled(model.lastFile == nil)
+                    .disabled(!model.hasCapture)
                 Button("Show Capture in Finder") { model.showInFinder() }
                     .keyboardShortcut("r", modifiers: [.command, .shift])
-                    .disabled(model.lastFile == nil)
+                    .disabled(model.savedFile == nil)
             }
         }
 
@@ -65,10 +68,13 @@ struct ContentView: View {
             labelFocused = true
             model.start()
         }
-        // Keep the label but select it after each capture, so typing the next one replaces it.
-        .onChange(of: model.captures) {
-            labelFocused = true
-            DispatchQueue.main.async { NSApp.sendAction(#selector(NSText.selectAll(_:)), to: nil, from: nil) }
-        }
+        // Keep the label but select it after each capture and save, so typing the next one replaces it.
+        .onChange(of: model.captures) { selectLabel() }
+        .onChange(of: model.saves) { selectLabel() }
+    }
+
+    private func selectLabel() {
+        labelFocused = true
+        DispatchQueue.main.async { NSApp.sendAction(#selector(NSText.selectAll(_:)), to: nil, from: nil) }
     }
 }

@@ -29,8 +29,16 @@ struct CaptureBar: View {
             }
             .controlSize(.large)
             .fixedSize()
-            .disabled(model.lastFile == nil)
-            .help("Copy the last capture to the clipboard (⇧⌘C)")
+            .disabled(!model.hasCapture)
+            .help("Copy the capture to the clipboard (⇧⌘C)")
+
+            Button(action: model.save) {
+                Label("Save", systemImage: "square.and.arrow.down")
+            }
+            .controlSize(.large)
+            .fixedSize()
+            .disabled(!model.canSave)
+            .help(model.savedFile != nil ? "This capture is saved" : "Save the capture to the folder under the file name shown (⌘S)")
 
             Button(action: model.capture) {
                 Label("Capture", systemImage: "camera.aperture")
@@ -64,7 +72,9 @@ private struct NameField: View {
     var body: some View {
         @Bindable var model = model
         TimelineView(.periodic(from: .now, by: 1)) { context in
-            let parts = FilenameTemplate(model.template).parts(date: context.date)
+            // An unsaved capture keeps its own time; otherwise the clock runs.
+            let date = model.savedFile == nil ? model.capturedAt ?? context.date : context.date
+            let parts = FilenameTemplate(model.template).parts(date: date)
             HStack(spacing: 0) {
                 Text(parts.before).foregroundStyle(.secondary).fixedSize()
                 TextField("Label", text: $model.label, prompt: Text("label (optional)"))
@@ -85,7 +95,7 @@ private struct NameField: View {
             )
             .contentShape(Rectangle())
             .onTapGesture { labelFocused.wrappedValue = true }
-            .help("The next capture's file name. Type a label; the date and time are filled in when you capture.")
+            .help("The name Save gives the capture. Type a label; the date and time are the moment of the capture.")
         }
     }
 }

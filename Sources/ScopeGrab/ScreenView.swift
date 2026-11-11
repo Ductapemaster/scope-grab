@@ -1,5 +1,6 @@
 import AppKit
 import SwiftUI
+import UniformTypeIdentifiers
 
 /// The last capture, framed like the scope's own display. Before the first capture it
 /// shows an empty graticule. Dragging it drags the saved PNG.
@@ -42,21 +43,32 @@ struct ScreenView: View {
         .aspectRatio(816.0 / 496.0, contentMode: .fit) // 800 × 480 screen plus the 8 pt bezel
         .shadow(color: .black.opacity(0.25), radius: 8, y: 3)
         .onChange(of: model.captures) {
-            guard case .saved = model.status, !reduceMotion else { return }
+            guard case .captured = model.status, !reduceMotion else { return }
             flash = 0.5
             withAnimation(.easeOut(duration: 0.35)) { flash = 0 }
         }
         .onDrag {
-            guard let file = model.lastFile, let provider = NSItemProvider(contentsOf: file) else { return NSItemProvider() }
+            // A saved capture drags its file; an unsaved one drags the image under the name Save would give it.
+            if let file = model.savedFile, let provider = NSItemProvider(contentsOf: file) {
+                provider.suggestedName = file.deletingPathExtension().lastPathComponent
+                return provider
+            }
+            guard let png = model.png else { return NSItemProvider() }
+            let provider = NSItemProvider()
+            provider.registerDataRepresentation(forTypeIdentifier: UTType.png.identifier, visibility: .all) { done in
+                done(png, nil)
+                return nil
+            }
             // Without this, Finder names the dropped file "PNG image.png".
-            provider.suggestedName = file.deletingPathExtension().lastPathComponent
+            provider.suggestedName = (model.pendingName() as NSString).deletingPathExtension
             return provider
         }
         .contextMenu {
-            Button("Copy Image", action: model.copyImage).disabled(model.lastFile == nil)
-            Button("Show in Finder", action: model.showInFinder).disabled(model.lastFile == nil)
+            Button("Copy Image", action: model.copyImage).disabled(!model.hasCapture)
+            Button("Save", action: model.save).disabled(!model.canSave)
+            Button("Show in Finder", action: model.showInFinder).disabled(model.savedFile == nil)
         }
-        .help(model.lastFile == nil ? "" : "Drag into a folder or app, or right-click to copy")
+        .help(model.hasCapture ? "Drag into a folder or app, or right-click to copy or save" : "")
     }
 }
 
