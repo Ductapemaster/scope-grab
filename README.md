@@ -40,3 +40,7 @@ The first runs the unit tests. The second adds live capture tests against the sc
 - `docs/`: the design and the roadmap.
 
 More on the scope: the vault note `3 Reference/Workshop/Rigol DS2072A/Rigol DS2072A.md`.
+
+## License
+
+MIT. See `LICENSE`.
