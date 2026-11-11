@@ -57,7 +57,7 @@ A single small window, top to bottom:
 1. **Save to:** the current folder's path, with a Change… button that opens a folder picker.
 2. **Label:** a text field, plus a Capture button that is the default action, so Enter in the label field captures, and a Copy button (⇧⌘C) that copies the last capture.
 3. **Preview:** the last capture, filling the window's width at the screen's 5:3 shape, with an empty placeholder before the first one. Dragging it drags the saved PNG, so dropping it on a folder copies the file and dropping it on an app inserts the image. Right-click offers Copy Image and Show in Finder.
-4. **Status line:** for example "Captured 14:32:05 · saved 2026-11-10 14-32-05 TP4 IF out.png". It shows "Capturing…" while a capture runs and the error in red when one fails. Its right end shows whether the scope is on USB ("DS2072A on USB" or "No scope on USB"), updated live from macOS's attach and detach notifications.
+4. **Status line:** for example "14:32:05 · 2026-11-10 14-32-05 TP4 IF out.png". It shows "Capturing…" while a capture runs and the error in red when one fails. Its right end shows whether the scope is on USB ("DS2072A on USB" or "No scope on USB"), updated live from macOS's attach and detach notifications.
 
 ## Capture behaviour
 
