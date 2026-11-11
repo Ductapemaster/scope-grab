@@ -10,7 +10,8 @@ struct ScopeGrabApp: App {
         Window("Scope Grab", id: "main") {
             ContentView()
         }
-        .windowResizability(.contentSize)
+        .windowResizability(.contentMinSize)
+        .defaultSize(width: 640, height: 560)
     }
 }
 
@@ -37,7 +38,8 @@ struct ContentView: View {
                             .lineLimit(1).truncationMode(.head)
                             .foregroundStyle(folder.isEmpty ? .secondary : .primary)
                             .help(folder)
-                        Spacer()
+                            // Let a long path truncate rather than widen the window.
+                            .frame(minWidth: 100, idealWidth: 200, maxWidth: .infinity, alignment: .leading)
                         Button("Change…") { _ = pickFolder() }
                     }
                 }
@@ -54,6 +56,7 @@ struct ContentView: View {
                 }
             }
 
+            // The preview fills the window's width at the screen's 5:3 shape.
             ZStack {
                 Rectangle().fill(.quaternary)
                 if let preview {
@@ -63,13 +66,14 @@ struct ContentView: View {
                 }
                 if busy { ProgressView() }
             }
-            .frame(width: 400, height: 240)
+            .aspectRatio(800.0 / 480.0, contentMode: .fit)
+            .frame(minWidth: 400, idealWidth: 640, maxWidth: .infinity, maxHeight: .infinity)
 
             Text(status)
                 .foregroundStyle(isError ? .red : .secondary)
                 .lineLimit(2)
                 .textSelection(.enabled)
-                .frame(width: 400, alignment: .leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(16)
         .onAppear {
