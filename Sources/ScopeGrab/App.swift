@@ -156,7 +156,7 @@ struct ContentView: View {
                 try png.write(to: file, options: .withoutOverwriting)
                 lastFile = file
                 preview = NSImage(data: png)
-                status = "\(started.formatted(date: .omitted, time: .standard)) · \(name)"
+                status = name
             } catch {
                 isError = true
                 status = "Capture failed: \(error.localizedDescription)"
