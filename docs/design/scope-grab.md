@@ -21,6 +21,7 @@ Success: Dan types a label, presses Enter, and within about 2 s the image is on 
 
 - USB. LAN only for now. USB needs libusb, the scope's USB Device = Computer setting, and a cable-order rule, all for a 0.5 s gain per shot.
 - Any SCPI beyond the screen capture: no scope control, waveform data, or settings.
+- Reading measurements over SCPI. Measurements switched on at the scope show in its measurement bar, so the screenshot records them. Reading them over SCPI was ruled out: querying an item adds it to that bar, no command lists the items already on it, and stable values need a STOP/RUN cycle around the capture.
 - A capture history or gallery. The folder is the history.
 - Burning a timestamp or label into the image.
 - Picking or integrating with the whiteboard app.
