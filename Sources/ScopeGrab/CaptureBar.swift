@@ -10,18 +10,7 @@ struct CaptureBar: View {
     var body: some View {
         HStack(alignment: .bottom, spacing: 12) {
             field("Save to") {
-                Button { model.pickFolder() } label: {
-                    Label(model.folderName, systemImage: "folder.fill")
-                        .lineLimit(1)
-                        .frame(maxWidth: 180)
-                }
-                .buttonStyle(TintedButtonStyle())
-                .fixedSize()
-                .help(model.folder.isEmpty ? "Choose where captures are saved"
-                      : "Saving to \((model.folder as NSString).abbreviatingWithTildeInPath). Click to change.")
-                .contextMenu {
-                    Button("Open Save Folder", action: model.openFolder).disabled(model.folderURL == nil)
-                }
+                FolderControl()
             }
 
             field("File name") {
@@ -39,6 +28,7 @@ struct CaptureBar: View {
                 Label("Copy", systemImage: "doc.on.doc")
             }
             .controlSize(.large)
+            .fixedSize()
             .disabled(model.lastFile == nil)
             .help("Copy the last capture to the clipboard (⇧⌘C)")
 
@@ -48,6 +38,7 @@ struct CaptureBar: View {
             }
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
+            .fixedSize()
             .keyboardShortcut(.defaultAction)
             .disabled(model.busy)
             .help("Capture the scope's screen (Return)")
@@ -96,23 +87,6 @@ private struct NameField: View {
             .onTapGesture { labelFocused.wrappedValue = true }
             .help("The next capture's file name. Type a label; the date and time are filled in when you capture.")
         }
-    }
-}
-
-/// An accent-colored outline and wash: a key control that isn't the main action.
-private struct TintedButtonStyle: ButtonStyle {
-    @Environment(\.isEnabled) private var isEnabled
-
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .foregroundStyle(Color.accentColor)
-            .padding(.horizontal, 10)
-            .frame(height: 28)
-            .background(Color.accentColor.opacity(configuration.isPressed ? 0.30 : 0.16),
-                        in: RoundedRectangle(cornerRadius: 6))
-            .overlay(RoundedRectangle(cornerRadius: 6).strokeBorder(Color.accentColor.opacity(0.45)))
-            .opacity(isEnabled ? 1 : 0.5)
-            .contentShape(Rectangle())
     }
 }
 

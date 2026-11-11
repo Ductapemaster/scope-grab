@@ -86,3 +86,10 @@ private let date = Date(timeIntervalSince1970: 1_794_321_125) // 2026-11-10 14:3
     #expect(p.before == "2026-11-10 14-32-05 ")
     #expect(p.after == ".png")
 }
+
+@Test func pathTrailCollapsesHome() {
+    #expect(pathTrail("/Users/dan/Knowledge Base/Captures/", home: "/Users/dan") == ["~", "Knowledge Base", "Captures"])
+    #expect(pathTrail("/Users/dan", home: "/Users/dan") == ["~"])
+    #expect(pathTrail("/Volumes/Life Admin/Bench", home: "/Users/dan") == ["/", "Volumes", "Life Admin", "Bench"])
+    #expect(pathTrail("/Users/danny/x", home: "/Users/dan") == ["/", "Users", "danny", "x"])
+}
