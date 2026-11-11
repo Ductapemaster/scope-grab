@@ -4,7 +4,7 @@ A small macOS app that captures the screen of the Rigol DS2072A bench scope over
 
 ## Use
 
-1. Type a label (optional), press Enter (or ⌘R). The capture is saved. The **File name** field shows the exact name it gets, with the date and time filled in around your label.
+1. Type a label (optional), press Enter (or ⌘R). The capture is saved. The **File name** field shows the exact name it gets, with the date and time filled in around your label, and the bar at the bottom shows the full path it was saved to (click it to show the file in Finder).
 2. To use it elsewhere, press **Copy** (⇧⌘C) and paste, or drag the preview into a folder or app. Right-click the preview for Copy Image and Show in Finder.
 
 The save folder is picked at first launch and remembered. **Save to** at the top left shows where captures go (`… › parent › folder`); click it to change the folder, or its chevron to see the full path. The file name pattern (`{date} {time} {label}` by default) is changed in Settings (⌘,), for example to `{label} {date} {time}` to sort by test point.
