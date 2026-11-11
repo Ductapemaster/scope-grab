@@ -6,7 +6,7 @@ A native macOS (SwiftUI) app that captures the Rigol DS2072A's screen over USB (
 - Swift package, no Xcode project. `swift test` for unit tests; `SCOPE_USB=1 swift test` adds live tests against the scope on USB.
 - `./build.sh` builds `build/Scope Grab.app`; `./build.sh install` copies it to `~/Applications`.
 - Protocol and file logic go in `ScopeGrabCore` (testable); `ScopeGrab` holds only UI.
-- Settings live in UserDefaults under `com.dankouba.scopegrab` (`folder`).
+- Settings live in UserDefaults under `com.dankouba.scopegrab` (`folder`, `filenameTemplate`).
 
 ## Guardrails
 - SCPI commands that change scope state (`:STOP`, `:RUN`, settings) affect Dan's bench session; restore the prior state.

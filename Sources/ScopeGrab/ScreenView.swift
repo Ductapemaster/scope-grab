@@ -72,8 +72,14 @@ private struct EmptyScreen: View {
             Graticule(centreOnly: true)
                 .stroke(.white.opacity(0.16), lineWidth: 1)
             VStack(spacing: 8) {
-                Image(systemName: model.scopeOnUSB == false ? "cable.connector.slash" : "camera.aperture")
-                    .font(.system(size: 30, weight: .light))
+                if model.scopeOnUSB == false {
+                    Image(systemName: "cable.connector.slash").font(.system(size: 30, weight: .light))
+                } else {
+                    SineWave()
+                        .stroke(style: StrokeStyle(lineWidth: 2.5, lineCap: .round, lineJoin: .round))
+                        .frame(width: 64, height: 26)
+                        .padding(.vertical, 4)
+                }
                 Text(model.scopeOnUSB == false ? "Connect the scope over USB" : "Press Return to capture the scope's screen")
                     .font(.title3)
             }
@@ -98,6 +104,20 @@ private struct Graticule: Shape {
         for j in 1..<rows where !centreOnly || j == rows / 2 {
             let y = r.minY + r.height * CGFloat(j) / CGFloat(rows)
             p.move(to: CGPoint(x: r.minX, y: y)); p.addLine(to: CGPoint(x: r.maxX, y: y))
+        }
+        return p
+    }
+}
+
+/// Two cycles of a sine, the trace in the empty screen (and in the app icon).
+private struct SineWave: Shape {
+    func path(in r: CGRect) -> Path {
+        var p = Path()
+        let steps = 96
+        for k in 0...steps {
+            let t = CGFloat(k) / CGFloat(steps)
+            let pt = CGPoint(x: r.minX + r.width * t, y: r.midY - r.height / 2 * sin(t * 4 * .pi))
+            k == 0 ? p.move(to: pt) : p.addLine(to: pt)
         }
         return p
     }

@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// The strip along the window's bottom edge: the save folder, the last result, and the USB link.
+/// The strip along the window's bottom edge: the last result and the USB link.
 struct StatusBar: View {
     @Environment(CaptureModel.self) private var model
 
@@ -8,8 +8,6 @@ struct StatusBar: View {
         VStack(spacing: 0) {
             Divider()
             HStack(spacing: 10) {
-                folderMenu
-                Divider().frame(height: 14)
                 message.frame(maxWidth: .infinity, alignment: .leading)
                 usbIndicator
             }
@@ -18,18 +16,6 @@ struct StatusBar: View {
             .frame(height: 30)
         }
         .background(.bar)
-    }
-
-    private var folderMenu: some View {
-        Menu {
-            Button("Change Save Folder…") { model.pickFolder() }
-            Button("Open Save Folder", action: model.openFolder).disabled(model.folderURL == nil)
-        } label: {
-            Label(model.folderURL?.lastPathComponent ?? "Choose a save folder", systemImage: "folder")
-        }
-        .menuStyle(.borderlessButton)
-        .fixedSize()
-        .help(model.folder.isEmpty ? "No save folder chosen" : "Saving to \((model.folder as NSString).abbreviatingWithTildeInPath)")
     }
 
     @ViewBuilder private var message: some View {

@@ -46,17 +46,23 @@ Success: Dan types a label, presses Enter, and within about 2 s the image is sav
 - **Connection:** USB, chosen once the scope's LAN proved faulty. The app finds the scope on its own, so the window has no connection setting.
 - **Outputs:** every capture is saved to a file. The clipboard is touched only on request: capturing never overwrites what Dan has copied.
 - **Label:** typed before capturing, used in the filename only. A copied image is just the screen.
+- **Color:** Capture and the save folder are the two colored controls, since a capture depends on both: Capture filled as the main action, the folder tinted.
 - **Save folder:** picked at first launch, shown in the window's status bar and changeable from there at any time, and sticky across captures and launches. Files go directly into the chosen folder. Dan makes subfolders himself when he wants them.
 - **Preview:** the last capture is shown in the window.
 - **Timestamp:** shown in the app window with the preview (Dan said "on the screen", read as the window, not drawn on the image).
 
 ## Window
 
-A single window with a unified toolbar, top to bottom:
+A single window, top to bottom:
 
-1. **Toolbar:** the label field in the middle, then Copy and Capture at the right. Capture is the default action, so Enter captures from anywhere in the window.
-2. **Preview:** the last capture, framed like the scope's own display and scaled to fill the window at the screen's 5:3 shape. Before the first capture it shows the DS2000A's empty 14 × 8 graticule with "Press Return to capture the scope's screen", or "Connect the scope over USB" while no scope is attached. A new capture flashes the frame briefly, unless Reduce Motion is on. Dragging the preview drags the saved PNG, so dropping it on a folder copies the file and dropping it on an app inserts the image. Right-click offers Copy Image and Show in Finder.
-3. **Status bar:** the save folder's name at the left, as a menu with Change Save Folder… and Open Save Folder, its full path in the tooltip. Next to it, the last capture's filename, for example "2026-11-10 14-32-05 TP4 IF out.png", which carries its time. It shows "Capturing…" while a capture runs and the error in red when one fails. The right end shows whether the scope is on USB ("DS2072A on USB" or "No scope on USB"), updated live from macOS's attach and detach notifications.
+1. **Capture bar:** a row that reads left to right as save here, under this name, then capture.
+   - **Save to:** the save folder's name, an accent-tinted button that opens the folder picker. Its tooltip gives the full path; right-click offers Open Save Folder.
+   - **File name:** the next capture's filename, live, with the label typed in place: for example `2026-11-10 14-32-05` in grey, then the label, then `.png` in grey. The date and time tick every second. A sliders button beside it opens Settings, where the pattern is changed.
+   - **Copy** (⇧⌘C), a plain bordered button, then **Capture** at the far right, filled in the accent color as the main action. Capture is the default action, so Enter captures from anywhere in the window.
+2. **Preview:** the last capture, framed like the scope's own display and scaled to fill the window at the screen's 5:3 shape. Before the first capture it shows the DS2000A's empty 14 × 8 graticule with a sine trace and "Press Return to capture the scope's screen", or an unplugged-cable icon and "Connect the scope over USB" while no scope is attached. A new capture flashes the frame briefly, unless Reduce Motion is on. Dragging the preview drags the saved PNG, so dropping it on a folder copies the file and dropping it on an app inserts the image. Right-click offers Copy Image and Show in Finder.
+3. **Status bar:** the last capture's filename. It shows "Capturing…" while a capture runs and the error in red when one fails. The right end shows whether the scope is on USB ("DS2072A on USB" or "No scope on USB"), updated live from macOS's attach and detach notifications.
+
+**Settings** (⌘,) holds the file name pattern, with an example rendered from it and a Restore Default button.
 
 The menu bar carries the same actions:
 
@@ -69,7 +75,7 @@ The menu bar carries the same actions:
 2. Disable the Capture button and show "Capturing…", keeping the UI responsive (the USB transfers run off the main thread).
 3. Open the scope's USBTMC interface, send `:DISP:DATA?`, read the whole reply, strip the block header to get the BMP, and close the interface.
 4. Convert the BMP to PNG in memory.
-5. Write `<YYYY-MM-DD HH-MM-SS> <label>.png` into the save folder, or `<YYYY-MM-DD HH-MM-SS>.png` when the label is blank. The timestamp is the capture time in local time.
+5. Write the file into the save folder, named by the file name pattern (default `{date} {time} {label}`, giving `2026-11-10 14-32-05 TP4 IF out.png`). The date and time are the capture time in local time.
 6. Update the preview and the status line.
 
 On any failure (scope not found on USB, a USB timeout, a malformed reply, or a write error) the preview and the files stay as they were, and the status line shows what failed in red.
@@ -83,13 +89,14 @@ These are the builder's choices and Dan hasn't reviewed them:
 - **Timeouts:** 5 s per USB transfer.
 - **One session per capture:** each capture opens the USB interface and closes it again, so a stuck transfer can't poison the next capture.
 - **Label after capture:** the label stays in the field, selected, so typing the next label replaces it and Enter alone reuses it. A reused label gets a new timestamp, so files don't collide. If a file with the exact name already exists (two captures in the same second), append ` 2`, ` 3` and so on.
-- **Filename safety:** `/` and `:` in the label become `-`. Surrounding whitespace is trimmed.
-- **Settings:** the folder path is stored in UserDefaults. The app isn't sandboxed, so a plain path is enough.
-- **Copy:** a toolbar button and the Edit menu's Copy Capture (⇧⌘C) rather than plain ⌘C, which the label field keeps for copying text. Copy reads the saved file and puts PNG and TIFF on the clipboard, so any whiteboard app can paste it.
+- **File name pattern:** `{date}` (`2026-11-10`), `{time}` (`14-32-05`) and `{label}`, in any order with any separators, set in Settings and stored in UserDefaults (`filenameTemplate`). A pattern without `{label}` gets ` {label}` appended, so a typed label is never dropped. With a blank label, separators left at either end are trimmed (`{date}_{label}` gives `2026-11-10.png`); a pattern that renders empty falls back to `{date} {time}`.
+- **Filename safety:** `/` and `:` in the label or pattern become `-`. Surrounding whitespace is trimmed.
+- **Settings:** the folder path and the file name pattern are stored in UserDefaults. The app isn't sandboxed, so a plain path is enough.
+- **Copy:** a button beside Capture and the Edit menu's Copy Capture (⇧⌘C) rather than plain ⌘C, which the label field keeps for copying text. Copy reads the saved file and puts PNG and TIFF on the clipboard, so any whiteboard app can paste it.
 - **Drag:** the preview drags the saved file rather than an in-memory image, so a drop into Finder gets the file under its capture name.
 - **No `*IDN?`:** the reference script sends `*IDN?` before capturing, but only to print it. The app sends `:DISP:DATA?` alone, and the real-scope test confirms that works.
-- **Look:** native macOS chrome (unified toolbar, status bar on the window's bottom edge, menu-bar commands) around one distinctive element, the preview framed as the scope's display. The graticule placeholder echoes the app icon.
+- **Look:** native macOS controls in a capture bar, a status bar on the window's bottom edge, and menu-bar commands, around one distinctive element: the preview framed as the scope's display. The empty graticule and its sine trace echo the app icon. The controls sit in a row of their own rather than the title-bar toolbar, because macOS drew the toolbar's Capture button uncolored and left it short of the window's trailing edge.
 - **Capture shortcut:** ⌘R in the menu, alongside Return in the window, so a capture works while focus is outside the label field.
-- **State:** one `CaptureModel` (`Sources/ScopeGrab/CaptureModel.swift`) holds the window's state and actions, so the toolbar, the status bar and the menu bar share them.
+- **State:** one `CaptureModel` (`Sources/ScopeGrab/CaptureModel.swift`) holds the window's state and actions, so the capture bar, the status bar and the menu bar share them.
 - **Layout checks:** a debug build started with `SCOPEGRAB_PREVIEW=<png>` shows that file as the last capture, to check the layout without the scope. Release builds ignore it.
 - **Tests:** unit tests for the block parser, the filename builder and the USBTMC headers. Live tests run only when `SCOPE_USB` is set, against the scope on USB.

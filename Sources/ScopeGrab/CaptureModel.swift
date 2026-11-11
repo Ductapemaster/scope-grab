@@ -16,6 +16,10 @@ final class CaptureModel {
     var folder: String {
         didSet { UserDefaults.standard.set(folder, forKey: "folder") }
     }
+    /// The filename pattern, e.g. `{date} {time} {label}`; see `FilenameTemplate`.
+    var template: String {
+        didSet { UserDefaults.standard.set(template, forKey: "filenameTemplate") }
+    }
     var label = ""
     private(set) var preview: NSImage?
     private(set) var lastFile: URL?
@@ -29,6 +33,7 @@ final class CaptureModel {
 
     init() {
         folder = UserDefaults.standard.string(forKey: "folder") ?? ""
+        template = UserDefaults.standard.string(forKey: "filenameTemplate") ?? FilenameTemplate.standard
         #if DEBUG
         // Layout checks without the scope: SCOPEGRAB_PREVIEW=<png> shows that file as the last capture.
         if let path = ProcessInfo.processInfo.environment["SCOPEGRAB_PREVIEW"] {
@@ -36,6 +41,7 @@ final class CaptureModel {
             preview = NSImage(contentsOf: url)
             lastFile = url
             status = .saved(url.lastPathComponent)
+            DispatchQueue.main.async { NSApp.activate(ignoringOtherApps: true) }
         }
         #endif
     }
@@ -46,6 +52,8 @@ final class CaptureModel {
         // Pick the save folder at first launch; after that it's remembered.
         if folder.isEmpty { DispatchQueue.main.async { _ = self.pickFolder() } }
     }
+
+    var folderName: String { folderURL?.lastPathComponent ?? "Choose Folder…" }
 
     var folderURL: URL? { folder.isEmpty ? nil : URL(fileURLWithPath: folder) }
 
@@ -72,6 +80,7 @@ final class CaptureModel {
         let label = label
         let dir = URL(fileURLWithPath: folder)
         let started = Date()
+        let template = FilenameTemplate(template)
 
         Task {
             defer { busy = false; captures += 1 }
@@ -82,7 +91,7 @@ final class CaptureModel {
                       let png = rep.representation(using: .png, properties: [:]) else {
                     throw CaptureError.notAnImage
                 }
-                let name = captureFilename(label: label, date: started) {
+                let name = template.filename(label: label, date: started) {
                     FileManager.default.fileExists(atPath: dir.appendingPathComponent($0).path)
                 }
                 let file = dir.appendingPathComponent(name)

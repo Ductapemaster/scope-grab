@@ -12,8 +12,7 @@ struct ScopeGrabApp: App {
                 .environment(model)
         }
         .windowResizability(.contentMinSize)
-        .windowToolbarStyle(.unified(showsTitle: true))
-        .defaultSize(width: 760, height: 540)
+        .defaultSize(width: 800, height: 600)
         .commands {
             CommandGroup(replacing: .newItem) {
                 Button("Capture Screen") { model.capture() }
@@ -36,6 +35,10 @@ struct ScopeGrabApp: App {
                     .disabled(model.lastFile == nil)
             }
         }
+
+        Settings {
+            SettingsView().environment(model)
+        }
     }
 }
 
@@ -48,42 +51,16 @@ struct ContentView: View {
     @FocusState private var labelFocused: Bool
 
     var body: some View {
-        @Bindable var model = model
         VStack(spacing: 0) {
+            CaptureBar(labelFocused: $labelFocused)
+            Divider()
             ScreenView()
                 .padding(20)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(.background.secondary)
             StatusBar()
         }
-        .frame(minWidth: 560, minHeight: 400)
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                TextField("Label", text: $model.label, prompt: Text("Label (optional)"))
-                    .textFieldStyle(.roundedBorder)
-                    .frame(width: 260)
-                    .focused($labelFocused)
-                    .onSubmit(model.capture)
-                    .help("Added to the filename, e.g. “TP4 IF out”")
-            }
-            ToolbarItemGroup(placement: .primaryAction) {
-                Button(action: model.copyImage) {
-                    Label("Copy", systemImage: "doc.on.doc")
-                }
-                .disabled(model.lastFile == nil)
-                .help("Copy the last capture to the clipboard (⇧⌘C)")
-
-                Button(action: model.capture) {
-                    Label("Capture", systemImage: "camera.aperture")
-                        .labelStyle(.titleAndIcon)
-                        .padding(.horizontal, 4)
-                }
-                .buttonStyle(.borderedProminent)
-                .keyboardShortcut(.defaultAction)
-                .disabled(model.busy)
-                .help("Capture the scope's screen (Return)")
-            }
-        }
+        .frame(minWidth: 760, minHeight: 440)
         .onAppear {
             labelFocused = true
             model.start()

@@ -4,7 +4,7 @@ A proposal for three optional interfaces around the capture window. None is buil
 
 ## Terms
 
-- **Inspector:** a panel that slides in along the window's right edge and is toggled from the toolbar. It is the macOS counterpart of the scope's own softkey menu on the right of its screen.
+- **Inspector:** a panel that slides in along the window's right edge and is toggled from a button at the end of the capture bar. It is the macOS counterpart of the scope's own softkey menu on the right of its screen.
 - **Shared connection** (`ScopeLink`): one open USB session to the scope that every feature sends through in turn, in place of today's open-capture-close session per capture.
 - **Measurement bar:** the row of up to five measurement readouts along the bottom of the scope's screen.
 - **Console:** a window for typing SCPI commands at the scope and reading the replies.
@@ -17,7 +17,9 @@ The app opens the scope's USBTMC interface for each capture and closes it again 
 
 ```
 ┌───────────────────────────────────────────────────────────────┐
-│ ● ● ●  Scope Grab      [ Label (optional) ]  ⧉  ◉ Capture  ▤ │  ▤ toggles the inspector
+│ ● ● ●                    Scope Grab                           │
+│ Save to      File name                                        │
+│ [📁 Desktop] [2026-11-11 09-14-02 TP4 .png] ⚙ [Copy] [Capture] ▤│  ▤ toggles the inspector
 ├──────────────────────────────────────────┬────────────────────┤
 │                                          │ Scope │ Measure    │
 │                                          │────────────────────│
@@ -27,7 +29,7 @@ The app opens the scope's USBTMC interface for each capture and closes it again 
 │                                          │ Trig CH1 ↑ 0.00 V  │
 │                                          │ [Run] [Stop] [Sgl] │
 ├──────────────────────────────────────────┴────────────────────┤
-│ 📁 Desktop ▾ │ 2026-11-10 21-27-04 TP4.png      ● DS2072A on USB│
+│ 2026-11-10 21-27-04 TP4.png                    ● DS2072A on USB│
 └───────────────────────────────────────────────────────────────┘
 
 Window ▸ SCPI Console (⌘K), a separate window:
