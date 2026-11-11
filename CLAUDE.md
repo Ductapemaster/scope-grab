@@ -1,12 +1,12 @@
 # CLAUDE.md — how to work in this repo
 
-A native macOS (SwiftUI) app that captures the Rigol DS2072A's screen over its LAN SCPI socket to the clipboard and a PNG. Overview + current state: see README.md and `docs/`.
+A native macOS (SwiftUI) app that captures the Rigol DS2072A's screen over USB (USBTMC) to the clipboard and a PNG. Overview + current state: see README.md and `docs/`.
 
 ## Conventions
-- Swift package, no Xcode project. `swift test` for unit tests; `SCOPE_HOST=<ip> swift test` adds live tests (real scope at 192.168.0.114, or `tools/fake_scope.py` on 127.0.0.1).
+- Swift package, no Xcode project. `swift test` for unit tests; `SCOPE_USB=1 swift test` adds live tests against the scope on USB.
 - `./build.sh` builds `build/Scope Grab.app`; `./build.sh install` copies it to `~/Applications`.
 - Protocol and file logic go in `ScopeGrabCore` (testable); `ScopeGrab` holds only UI.
-- Settings live in UserDefaults under `com.dankouba.scopegrab` (`host`, `folder`).
+- Settings live in UserDefaults under `com.dankouba.scopegrab` (`folder`).
 
 ## Guardrails
 - SCPI commands that change scope state (`:STOP`, `:RUN`, settings) affect Dan's bench session; restore the prior state.

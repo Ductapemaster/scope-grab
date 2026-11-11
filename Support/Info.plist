@@ -24,7 +24,5 @@
 	<string>NSApplication</string>
 	<key>NSHighResolutionCapable</key>
 	<true/>
-	<key>NSLocalNetworkUsageDescription</key>
-	<string>Scope Grab connects to your oscilloscope on the local network to capture its screen.</string>
 </dict>
 </plist>

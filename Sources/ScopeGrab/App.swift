@@ -19,7 +19,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 }
 
 struct ContentView: View {
-    @AppStorage("host") private var host = "192.168.0.114"
     @AppStorage("folder") private var folder = ""
     @State private var label = ""
     @State private var preview: NSImage?
@@ -32,11 +31,7 @@ struct ContentView: View {
         VStack(alignment: .leading, spacing: 10) {
             Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
                 GridRow {
-                    Text("Scope").gridColumnAlignment(.trailing)
-                    TextField("IP address", text: $host).frame(width: 140)
-                }
-                GridRow {
-                    Text("Save to")
+                    Text("Save to").gridColumnAlignment(.trailing)
                     HStack {
                         Text(folder.isEmpty ? "No folder chosen" : (folder as NSString).abbreviatingWithTildeInPath)
                             .lineLimit(1).truncationMode(.head)
@@ -104,7 +99,6 @@ struct ContentView: View {
         busy = true
         isError = false
         status = "Capturing…"
-        let host = host.trimmingCharacters(in: .whitespaces)
         let label = label
         let dir = URL(fileURLWithPath: folder)
         let started = Date()
@@ -112,7 +106,8 @@ struct ContentView: View {
         Task {
             defer { busy = false; selectLabel() }
             do {
-                let bmp = try await Scope.session(host: host) { try await $0.screen() }
+                // USB calls block, so they run off the main thread.
+                let bmp = try await Task.detached { try Scope.session { try $0.screen() } }.value
                 guard let rep = NSBitmapImageRep(data: bmp),
                       let png = rep.representation(using: .png, properties: [:]) else {
                     throw CaptureError.notAnImage

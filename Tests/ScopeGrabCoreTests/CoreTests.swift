@@ -21,6 +21,20 @@ import Testing
     #expect(throws: BlockError.badHeader) { try parseBlockHeader(Array("#0".utf8)) }
 }
 
+@Test func usbtmcOutHeader() {
+    #expect(usbtmcHeader(.devDepMsgOut, tag: 1, size: 0x0102_0304, eom: true)
+            == [1, 1, 0xFE, 0, 0x04, 0x03, 0x02, 0x01, 1, 0, 0, 0])
+    #expect(usbtmcHeader(.requestDevDepMsgIn, tag: 7, size: 64)[0...3] == [2, 7, 0xF8, 0])
+}
+
+@Test func usbtmcInHeader() throws {
+    let h = try parseInHeader([2, 5, 0xFA, 0, 0x0B, 0, 0, 0, 1, 0, 0, 0], tag: 5)
+    #expect(h.size == 11)
+    #expect(h.eom)
+    #expect(throws: ScopeError.self) { try parseInHeader([2, 6, 0xF9, 0, 0, 0, 0, 0, 0, 0, 0, 0], tag: 5) }
+    #expect(throws: ScopeError.self) { try parseInHeader([2, 5, 0xFA], tag: 5) }
+}
+
 private let utc = TimeZone(identifier: "UTC")!
 private let date = Date(timeIntervalSince1970: 1_794_321_125) // 2026-11-10 14:32:05 UTC
 

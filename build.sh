@@ -13,8 +13,7 @@ cp "$bin" "$app/Contents/MacOS/ScopeGrab"
 mkdir -p "$app/Contents/Resources"
 cp Support/Info.plist "$app/Contents/Info.plist"
 cp Support/AppIcon.icns "$app/Contents/Resources/AppIcon.icns"
-# Ad-hoc signature: enough for a local app, and it gives macOS a stable identity
-# for the Local Network permission.
+# Ad-hoc signature: enough for a local app.
 codesign --force --sign - "$app"
 echo "built $app"
 
